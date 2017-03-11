@@ -1,0 +1,9 @@
+{
+  "AUTHOR" : "awbdallas",
+  "SHORT" : "Utility functions for me",
+  "DESCRIPTION" : "Just ulity functions for myself",
+  "DISABLED" : false,
+  "NAME" : "awbdallas-utility",
+  "TAGS" : ["utility"],
+  "INSTALL_MSG" : "Usage: `check help`"
+}
