@@ -1,5 +1,6 @@
 import discord
 import aiohttp
+import asyncio
 
 from os import getenv
 from discord.ext import commands
@@ -20,9 +21,10 @@ class Utility:
 
 
     @commands.command()
-    async def strawpoll(self, command : str):
-        """Makes a straw poll"""
-        create_poll_url = 'https://strawpoll.me/api/v2/polls'
+    async def strawpoll(self, *args):
+        """Makes a strawpoll: <op>strawpoll <questions>;<option1>;.."""
+        command = ' '.join(args)
+        endpoint = 'https://strawpoll.me/api/v2/polls'
         strawpoll = 'https://www.strawpoll.me/'
 
         create_data = {
@@ -39,7 +41,7 @@ class Utility:
             await self.bot.say("<op> title;option1;option2;...")
             return
         
-        async with aiohttp.post(create_poll_url, data = dumps(create_data)) as response:
+        async with aiohttp.post(endpoint, data = dumps(create_data)) as response:
             if response.status != 200:
                 await self.bot.say("Error making this poll")
                 return
@@ -49,6 +51,24 @@ class Utility:
             await self.bot.say("Here's a link to the poll: {}".format(
                 strawpoll + str(holding["id"])
             ))
+
+            # TODO set this as a command later? 
+            await asyncio.sleep(300)
+
+            async with aiohttp.get(endpoint + '/' + str(holding["id"])) as results_response:
+                if response.status != 200:
+                    await self.bot.say("Error Getting Results")
+                    return
+
+                holding = await results_response.json()
+                response = "Title: {}".format(holding["title"])
+                response_options_votes = zip(holding["options"], holding["votes"])
+                response += '\n\nResults\n'
+                for option in zip(holding["options"], holding["votes"]):
+                    response += "{} : {}\n".format(option[0], str(option[1]))
+
+                await self.bot.say(response)
+
 
     
     @commands.command()
