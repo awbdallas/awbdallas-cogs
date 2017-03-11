@@ -134,7 +134,7 @@ class Utility:
             await self.bot.say(response)
 
         except:
-            await self.bot.say("Error with subreddit. Either doesn't exist or error connecting to reddit")
+            await self.bot.say("Error with getting subreddit infomration.")
             return
 
 

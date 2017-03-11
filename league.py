@@ -34,7 +34,7 @@ class League:
 
 
     def _create_user(self, user, summoner_name):
-        summoner = self.riotapi.get_summoner_by_name(summoner_name)
+        summoner = self.lookup_summoner(summoner_name)
         if summoner:
             self.accounts[user] = {}
             self.accounts[user]['summoner_name'] = summoner_name
@@ -44,9 +44,23 @@ class League:
             return False
 
 
+    def _delete_user(self, user):
+        if self.account_exists(user):
+            del(self.accounts[user])
+            self._save_info()
+
+
     def _get_summoner(self, user):
         summoner = self.riotapi.get_summoner_by_name(self.accounts[user]['summoner_name'])
         return summoner
+
+
+    def lookup_summoner(self, name):
+        try:
+            summoner = self.riotapi.get_summoner_by_name(name)
+            return summoner
+        except:
+            return None
         
 
     def account_exists(self, user):
@@ -56,7 +70,20 @@ class League:
             return False
     
     
-    # TODO
+    #TODO summary information
+    @commands.command()
+    async def summoner_lookup(self, *args):
+        summoner_name = ' '.join(args)
+        summoner = self.lookup_summoner(summoner_name)
+
+        if summoner:
+            await self.bot.say("{} is level {} summoner on the NA server".format(
+                summoner.name, summoner.level
+            ))
+        else:
+            await self.bot.say("Unable to find user")
+
+
     @commands.command(pass_context=True)
     async def last_match(self, ctx):
         endpoint = "http://matchhistory.na.leagueoflegends.com/en/#match-details/NA1/"
@@ -74,10 +101,23 @@ class League:
 
 
     @commands.command(pass_context=True)
-    async def associate(self, ctx, summoner_name : str):
+    async def associate(self, ctx, *args):
         user = ctx.message.author.id
+
+        if len(args) >= 2:
+            if args[0] == '-override':
+                self._delete_user(user)
+                summoner_name = ' '.join(args[1:])
+        else:
+            summoner_name = ' '.join(args)
+
+
         if self.account_exists(user):
-            await self.bot.say("Account already exists")
+            response = """\
+            This account already exists. If you wish to overwrite this do:
+            <op>associate -override new name
+            """
+            await self.bot.say(response)
             return
 
         if self._create_user(user, summoner_name):
