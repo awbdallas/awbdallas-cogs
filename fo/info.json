@@ -1,0 +1,9 @@
+{
+"AUTHOR" : "awbdallas",
+"SHORT" : "COG for FO related services",
+"DESCRIPTION": "FOASS is a great thing",
+"DISABLED" : false,
+"NAME": "awbdallas-cogs",
+"TAGS" : ["FOASS"],
+"INSTALL_MSG" : "Whoever did it deserved it."
+}
